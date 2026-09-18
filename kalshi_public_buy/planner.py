@@ -1,176 +1,71 @@
-from __future__ import annotations
-
-from decimal import Decimal, InvalidOperation
+"""Deterministic synthetic-data planner. No transport or credential surface."""
 import hashlib
 import json
 import re
-from typing import Any, Mapping
 
-SCHEMA_VERSION = 'kalshi-buy-public-snapshot-v1'
-CONTRACTS = 10
-ECONOMIC_PRICE_CENTS = Decimal('1')
-MAX_MARKET_DATA_AGE_SECONDS = Decimal('10')
-MAX_FINANCIAL_EVIDENCE_CENTS = Decimal('1000000000000')
-TICKER_PATTERN = re.compile(r'^[A-Z0-9][A-Z0-9_.:-]{2,63}$')
-ALLOWED_FIELDS = {
-    'schema_version', 'round_id', 'ticker', 'side', 'market_status',
-    'platform_status', 'market_data_age_seconds', 'price_grid_allows_one_cent',
-    'fee_evidence_complete', 'balance_evidence_complete', 'scoped_balance_cents',
-    'modeled_fee_cents', 'exchange_index', 'observed_exchange_indexes',
-    'existing_open_order', 'position_contracts', 'book_would_cross',
-    'prior_intent_ids', 'notes',
-}
+BUILD = "KALBUY-PUBLIC-69.97.1-OFFLINE-REPLACEMENT"
+SCHEMA = "kalshi-public-snapshot-v2"
+TEXT_FIELDS = {"market", "round", "scope", "observed_scope", "route", "observed_route"}
+BOOL_FIELDS = {"synthetic", "market_open", "exchange_ready", "evidence_complete", "fees_complete", "prior_intent_ambiguous"}
+COMMON_FIELDS = TEXT_FIELDS | BOOL_FIELDS | {"schema", "side", "status_build", "age_seconds", "status_age_seconds", "fee_age_seconds", "seen_intent_ids"}
+INTEGER_FIELDS = ['balance_cents', 'entry_fee_cents', 'position_contracts', 'open_contracts', 'best_ask_cents']
+EXTRA_BOOLS = ['one_cent_supported']
+REQUIRED = COMMON_FIELDS | set(INTEGER_FIELDS) | set(EXTRA_BOOLS)
 
 
-def _decimal(value: Any, field: str, errors: list[str]) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except (InvalidOperation, ValueError, TypeError):
-        errors.append(f'invalid_{field}')
-        return Decimal('0')
-    if not result.is_finite():
-        errors.append(f'invalid_{field}')
-        return Decimal('0')
-    return result
+def outcome(status, reason, **details):
+    return {"status": status, "reason": reason, "mode": "OFFLINE_ONLY", "synthetic": True, **details}
 
 
-def _intent_id(snapshot: Mapping[str, Any]) -> str:
-    body = {
-        'round_id': snapshot.get('round_id'),
-        'ticker': snapshot.get('ticker'),
-        'side': snapshot.get('side'),
-        'exchange_index': snapshot.get('exchange_index'),
-        'contracts': CONTRACTS,
-        'economic_price_cents': str(ECONOMIC_PRICE_CENTS),
-    }
-    encoded = json.dumps(body, sort_keys=True, separators=(',', ':')).encode('utf-8')
-    return 'public-plan-' + hashlib.sha256(encoded).hexdigest()[:24]
-
-
-def plan_buy(snapshot: Mapping[str, Any]) -> dict[str, Any]:
-    errors: list[str] = []
-    holds: list[str] = []
-    quarantines: list[str] = []
-
-    if not isinstance(snapshot, Mapping):
-        return _result('INVALID', ['snapshot_not_object'], None)
-
-    unknown = sorted(set(snapshot) - ALLOWED_FIELDS)
-    if unknown:
-        errors.extend(f'unsupported_field:{name}' for name in unknown)
-
-    if snapshot.get('schema_version') != SCHEMA_VERSION:
-        errors.append('unsupported_schema_version')
-
-    round_id = snapshot.get('round_id')
-    if not isinstance(round_id, str) or not round_id.strip():
-        errors.append('invalid_round_id')
-
-    ticker = snapshot.get('ticker')
-    if not isinstance(ticker, str) or not TICKER_PATTERN.fullmatch(ticker):
-        errors.append('invalid_ticker')
-
-    side = snapshot.get('side')
-    if side not in {'yes', 'no'}:
-        errors.append('invalid_side')
-
-    if snapshot.get('market_status') != 'open':
-        holds.append('market_not_open')
-    if snapshot.get('platform_status') != 'operational':
-        holds.append('platform_not_operational')
-
-    age = _decimal(snapshot.get('market_data_age_seconds'), 'market_data_age_seconds', errors)
-    if age < 0 or age > MAX_MARKET_DATA_AGE_SECONDS:
-        holds.append('market_data_stale')
-
-    if snapshot.get('price_grid_allows_one_cent') is not True:
-        holds.append('one_cent_price_not_supported')
-    if snapshot.get('fee_evidence_complete') is not True:
-        holds.append('fee_evidence_incomplete')
-    if snapshot.get('balance_evidence_complete') is not True:
-        holds.append('balance_evidence_incomplete')
-
-    modeled_fee = _decimal(snapshot.get('modeled_fee_cents'), 'modeled_fee_cents', errors)
-    balance = _decimal(snapshot.get('scoped_balance_cents'), 'scoped_balance_cents', errors)
-    if modeled_fee < 0 or balance < 0:
-        errors.append('negative_financial_value')
-    if modeled_fee > MAX_FINANCIAL_EVIDENCE_CENTS:
-        errors.append('modeled_fee_cents_out_of_range')
-    if balance > MAX_FINANCIAL_EVIDENCE_CENTS:
-        errors.append('scoped_balance_cents_out_of_range')
-    required = Decimal(CONTRACTS) * ECONOMIC_PRICE_CENTS + modeled_fee
-    if balance < required:
-        holds.append('scoped_balance_insufficient')
-
-    exchange_index = snapshot.get('exchange_index')
-    if not isinstance(exchange_index, int) or isinstance(exchange_index, bool) or exchange_index < 0:
-        errors.append('invalid_exchange_index')
-
-    observed = snapshot.get('observed_exchange_indexes')
-    if not isinstance(observed, list) or not observed or any(
-        not isinstance(item, int) or isinstance(item, bool) or item < 0 for item in observed
-    ):
-        errors.append('invalid_observed_exchange_indexes')
-        observed_set: set[int] = set()
-    else:
-        observed_set = set(observed)
-        if len(observed_set) > 1:
-            quarantines.append('conflicting_observed_exchange_indexes')
-        if isinstance(exchange_index, int) and exchange_index not in observed_set:
-            quarantines.append('intended_observed_shard_mismatch')
-
-    if snapshot.get('existing_open_order') is not False:
-        holds.append('existing_open_order')
-
-    position = snapshot.get('position_contracts')
-    if not isinstance(position, int) or isinstance(position, bool) or position < 0:
-        errors.append('invalid_position_contracts')
-    elif position != 0:
-        holds.append('existing_position')
-
-    if snapshot.get('book_would_cross') is not False:
-        holds.append('post_only_would_cross')
-
-    prior_ids = snapshot.get('prior_intent_ids')
-    if not isinstance(prior_ids, list) or any(not isinstance(item, str) for item in prior_ids):
-        errors.append('invalid_prior_intent_ids')
-        prior_ids = []
-
-    intent_id = _intent_id(snapshot) if not errors else None
-    if intent_id and intent_id in prior_ids:
-        holds.append('duplicate_intent')
-
-    if errors:
-        return _result('INVALID', errors, intent_id)
-    if quarantines:
-        return _result('QUARANTINE', quarantines, intent_id)
-    if holds:
-        return _result('HOLD', holds, intent_id)
-
-    return {
-        **_result('PLAN', [], intent_id),
-        'plan': {
-            'ticker': ticker,
-            'round_id': round_id,
-            'side': side,
-            'contracts': CONTRACTS,
-            'economic_price_cents': str(ECONOMIC_PRICE_CENTS),
-            'principal_cents': str(Decimal(CONTRACTS) * ECONOMIC_PRICE_CENTS),
-            'modeled_fee_cents': str(modeled_fee),
-            'exchange_index': exchange_index,
-            'order_behavior': 'post-only planning evidence',
-        },
-    }
-
-
-def _result(decision: str, reasons: list[str], intent_id: str | None) -> dict[str, Any]:
-    return {
-        'schema_version': 'kalshi-buy-public-plan-result-v1',
-        'decision': decision,
-        'reason_codes': sorted(set(reasons)),
-        'intent_id': intent_id,
-        'network_access': False,
-        'credential_support': False,
-        'live_write_capability': False,
-        'write_authority': 'none',
-    }
+def plan(snapshot):
+    """Fail closed; input quantities and fees are invented evidence, never live data."""
+    if not isinstance(snapshot, dict) or set(snapshot) != REQUIRED:
+        return outcome("INVALID", "SCHEMA_MISMATCH")
+    s = snapshot
+    if s["schema"] != SCHEMA or s["synthetic"] is not True or s["side"] not in ("yes", "no"):
+        return outcome("INVALID", "SYNTHETIC_INPUT_REQUIRED")
+    for key in TEXT_FIELDS:
+        if not isinstance(s[key], str) or not re.fullmatch(r"SYNTHETIC-[A-Z0-9_-]{1,40}", s[key]):
+            return outcome("INVALID", "SYNTHETIC_IDENTIFIER_REQUIRED")
+    if any(type(s[key]) is not bool for key in BOOL_FIELDS | set(EXTRA_BOOLS)):
+        return outcome("INVALID", "BOOLEAN_REQUIRED")
+    for key in ("age_seconds", "status_age_seconds", "fee_age_seconds", *INTEGER_FIELDS):
+        if type(s[key]) is not int or not 0 <= s[key] <= 1000000:
+            return outcome("INVALID", "BOUNDED_INTEGER_REQUIRED")
+    seen = s["seen_intent_ids"]
+    if not isinstance(seen, list) or len(seen) > 100 or any(not isinstance(value, str) or not re.fullmatch(r"[a-f0-9]{64}", value) for value in seen):
+        return outcome("INVALID", "INVALID_INTENT_EVIDENCE")
+    if s["status_build"] != BUILD:
+        return outcome("QUARANTINE", "STATUS_IDENTITY_CONFLICT")
+    if s["scope"] != s["observed_scope"] or s["route"] != s["observed_route"]:
+        return outcome("QUARANTINE", "SCOPE_OR_ROUTE_CONFLICT")
+    if s["prior_intent_ambiguous"]:
+        return outcome("QUARANTINE", "RECONCILIATION_REQUIRED")
+    if max(s["age_seconds"], s["status_age_seconds"], s["fee_age_seconds"]) > 30:
+        return outcome("HOLD", "STALE_EVIDENCE")
+    if not s["evidence_complete"] or not s["fees_complete"]:
+        return outcome("HOLD", "INCOMPLETE_EVIDENCE")
+    if not s["market_open"] or not s["exchange_ready"]:
+        return outcome("HOLD", "UNAVAILABLE")
+    quantity, price = 10, 1
+    if not s["one_cent_supported"]:
+        return outcome("HOLD", "UNSUPPORTED_PRICE_GRID")
+    if not 1 <= s["best_ask_cents"] <= 99:
+        return outcome("INVALID", "INVALID_BOOK_PRICE")
+    if s["best_ask_cents"] <= price:
+        return outcome("HOLD", "POST_ONLY_WOULD_CROSS")
+    if s["position_contracts"] or s["open_contracts"]:
+        return outcome("HOLD", "EXISTING_EXPOSURE")
+    required_funding = quantity * price + s["entry_fee_cents"]
+    if s["balance_cents"] < required_funding:
+        return outcome("HOLD", "INSUFFICIENT_SCOPED_FUNDS")
+    identity_extra = {}
+    details = {"principal_cents": 10, "modeled_entry_fee_cents": s["entry_fee_cents"],
+               "required_funding_cents": required_funding, "post_only": True}
+    identity = {key: s[key] for key in ("market", "round", "side", "scope", "route")}
+    identity.update({"action": "buy", "quantity": quantity, "price_cents": price, **identity_extra})
+    intent_id = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if intent_id in seen:
+        return outcome("HOLD", "DUPLICATE_INTENT")
+    return outcome("PLAN", "SYNTHETIC_PLAN_ONLY", intent_id=intent_id,
+                   quantity=quantity, price_cents=price, **details)

@@ -10,10 +10,10 @@ echo Python 3.11 or newer is required. No installation was attempted.
 popd
 exit /b 2
 :use_py
-py -3 -I -S -B "%~dp0run_buy_planner.py" %*
+py -3 -I -S -B "%~dp0run_buy_planner.py" --export
 goto done
 :use_python
-python -I -S -B "%~dp0run_buy_planner.py" %*
+python -I -S -B "%~dp0run_buy_planner.py" --export
 :done
 set "RESULT=%ERRORLEVEL%"
 popd

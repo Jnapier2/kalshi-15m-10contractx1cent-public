@@ -1,37 +1,23 @@
-# Public Sterilization Report
+# Public replacement and sanitization
 
-## Source lineage
+## Scope
 
-This public edition is derived from the reviewed feature lineage of
-**Kalshi 15-Minute 1¢ Buy Bot v69.68**. It is not a copy of the private operational package and
-does not inherit private release or live-trading authority.
+Source lineage reviewed: `v69.97`. All entries in the uploaded source archive were inventoried, read as text for pattern scanning, and checked for unsafe archive paths. Relevant release, policy, and execution contracts informed the synthetic implementation. This is not a claim that every private engine path was dynamically tested.
 
-## Removed from the public edition
+The public tree is assembled from an explicit file allowlist, not by publishing the source archive and blanking key values. Private source, account configuration, runtime profiles, network clients, signers, order engines, live launchers, diagnostics, personal paths, account identifiers, and historic support records are excluded.
 
-- Credentials, private keys, account identifiers, environment templates, and
-  local configuration.
-- HTTP, WebSocket, authentication, request-signing, and retry transport code.
-- Order creation, cancellation, amendment, decrease, transfer, withdrawal, and
-  funding behavior.
-- Private logs, state, databases, receipts, diagnostics, support exports,
-  machine labels, and local paths.
-- Live performance evidence, strategy-graduation controls, and private
-  operational thresholds not required for the public planner.
-- Historical compatibility launchers and duplicate implementation surfaces.
+## Retained learning behavior
 
-## Retained in public-safe form
+Exactly 10 whole contracts at exactly 1¢; 10¢ principal plus supplied modeled entry fees. A proposed 1¢ price must not cross the supplied best ask. Existing position or open-order exposure blocks another plan.
 
-- Deterministic snapshot validation and explicit evidence states.
-- Fail-closed decisions for stale, incomplete, contradictory, or unsupported
-  inputs.
-- The public planning contract described in the repository README.
-- Versioned metadata, normalized manifest verification, regression tests, and
-  one thin Windows convenience launcher.
+Scope contradictions, stale or incomplete evidence, ambiguous intent, and duplicate-intent evidence are handled visibly. All examples use invented identifiers. Whole-cent fees are explicit educational assumptions.
 
-## Result
+## Replacement boundaries
 
-No configuration switch, environment variable, command-line option, source
-edit, or direct module call can enable account mutations because the public
-code contains no network or mutation implementation.
+The current source tree is replaced as a single normal descendant commit. Prior Git history is retained for rollback; older branches, tags, releases, pull requests, forks, caches, and account secrets are not rewritten, deleted, or certified by this pass. Original private uploads are not published. Existing MIT and third-party notices are retained.
+
+## Verification
+
+The manifest covers the complete active payload. Tests exercise synthetic decision paths, strict input rejection, no-network boundaries, exports, and package tampering. No private build, live-provider behavior, profitability, Windows host, or antivirus status is certified. See VALIDATION.md for measured local results.
 
 Copyright © 2026 Gateway Information Group LLC. All rights reserved.

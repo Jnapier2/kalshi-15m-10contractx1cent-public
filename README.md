@@ -1,80 +1,50 @@
 # Kalshi 10×1¢ Public Edition
 
-**Fresh public edition based on the v69.68 engineering lineage.**
-
-This repository turns a sanitized market-state snapshot into a deterministic
-plan for the fixed public profile: exactly **10 contracts at exactly 1¢**.
-It demonstrates exchange-state truth, shard-conflict handling, stale-evidence
-rejection, scoped funding checks, and duplicate-intent protection.
-
-> **Offline and read-only by construction.** This source contains no network
-> client, credential loader, request signer, or order mutation code. It cannot
-> connect to Kalshi or place a trade.
+An offline educational planner demonstrating scoped funding checks, stale-data rejection, contradiction handling, and duplicate-intent prevention. It has no credentials, network access, or order authority.
 
 ## Quick start
 
-Python 3.11 or newer is sufficient; there are no runtime dependencies.
+Python 3.11 or newer; no runtime packages or account setup are required.
 
-```bash
-python scripts/verify_release.py
-python run_buy_planner.py examples/eligible_snapshot.json
-python -m unittest discover -s tests -v
+```console
+python -I -S -B run_buy_planner.py --demo
+python -I -S -B run_buy_planner.py --verify
+python -I -S -B run_buy_planner.py --menu
+python -I -S -B run_buy_planner.py examples/conflict_snapshot.json
+python -I -S -B run_buy_planner.py --export
+python -B -m unittest discover -s tests -v
 ```
 
-On Windows, `Kalshi10x1cPublic.bat examples\eligible_snapshot.json` is the
-single BAT convenience launcher. It delegates to the canonical Python entrypoint.
+On Windows, run `Kalshi10x1cPublic.bat` for the synthetic demo or pass `--menu` for grouped Start, Reports, and Setup actions. `Kalshi10x1cPublic_Export.bat` independently creates a minimal support ZIP under `outputs/support/`. Both launchers locate the project from their own directory; neither installs software or changes security settings.
 
-## Fixed public contract
+## What the planner demonstrates
 
-| Property | Value |
-| --- | ---: |
-| Contracts | `10` |
-| Economic price | `1¢` per contract |
-| Principal before modeled fees | `10¢` |
-| Order style | Post-only planning evidence |
-| Network access | None |
-| Credential support | None |
-| Live write authority | None |
+Exactly 10 whole contracts at exactly 1¢; 10¢ principal plus supplied modeled entry fees. A proposed 1¢ price must not cross the supplied best ask. Existing position or open-order exposure blocks another plan.
 
-## Evidence reviewed before a plan is emitted
+Each snapshot must be explicitly synthetic, use `SYNTHETIC-` identifiers, and provide complete, typed inputs. The planner checks scope and route agreement, status identity, market readiness, bounded evidence age, fee completeness, and prior-intent evidence. Unknown fields, malformed values, duplicate JSON keys, oversized inputs, and non-finite numbers are rejected without echoing their contents.
 
-- Snapshot schema and required critical inputs.
-- Open market and operational platform state.
-- Bounded market-data age.
-- One-cent price-grid support.
-- Complete fee and scoped-balance evidence.
-- Intended exchange shard versus observed REST/order/fill shard evidence.
-- Existing open-order and position conflicts.
-- Deterministic duplicate intent IDs for the same ticker, round, side, shard,
-  count, and price.
-- A caller-provided final book-crossing check.
+Fees are explicit synthetic inputs used for scoped funding checks. No return, fill, or profitability claim is made.
 
-Results are `PLAN`, `HOLD`, `QUARANTINE`, or `INVALID`. `PLAN` is still only
-educational output; the public source has no route that can submit it.
+Results are `PLAN`, `HOLD`, `QUARANTINE`, `INVALID`. `PLAN` is educational output only. Freshness means supplied ages are no more than 30 seconds; this offline tool cannot authenticate those ages or confirm real exchange state.
 
-## Input
+Duplicate prevention is deterministic comparison against supplied intent IDs and exposure evidence. Ambiguous prior intent requires reconciliation. It is not a durable execution ledger, a multi-process lock, or a guarantee about live orders.
 
-See `examples/eligible_snapshot.json`. The input is a synthetic or independently
-sanitized JSON snapshot. Do not include credentials, private account data, or
-production identifiers.
+## Public boundary
 
-## What changed from the previous public repository
+There is no transport, signing, credential loading, account access, order submission, cancellation, fund movement, or hidden live-mode option. Samples are invented. Do not use private account exports as inputs.
 
-- Updated the public lineage from the older v1.0.1 source to v69.68.
-- Removed authentication, network transport, credential setup, and live-mode
-  documentation from current `main`.
-- Added shard-specific evidence reconciliation and ticker-level quarantine.
-- Added deterministic duplicate-intent protection.
-- Added normalized release-identity verification and a lean standard-library-only
-  runtime.
-- Preserved the repository name and history while replacing the active source.
+Package verification checks exact managed hashes and release identity before planner imports. Python isolated/no-site/no-bytecode flags prevent project-local import shadowing on the canonical entrypoint. Checksums detect changes against the supplied manifest; they are not a publisher signature. Only `.git/` and the non-executable `outputs/` area are excluded from the payload inventory.
 
-Read [PUBLIC_STERILIZATION_REPORT.md](PUBLIC_STERILIZATION_REPORT.md),
-[SECURITY.md](SECURITY.md), and [DISCLAIMER.md](DISCLAIMER.md).
+The independent Export20 path emits four generated files without reading input snapshots, logs, source, credentials, environment variables, or account records. An integrity failure attempts one bounded local export and exits; a failed export is reported, not retried recursively.
+
+## Release and evidence
+
+Public version `69.97-public.1` is an educational reimplementation informed by source lineage `v69.97`, not a redacted live bot or a release of that private engine. The active repository tree is replaced in full while its URL, history, MIT license, public title, execution namespace, and canonical launcher are preserved.
+
+See [VALIDATION.md](VALIDATION.md), [PUBLIC_STERILIZATION_REPORT.md](PUBLIC_STERILIZATION_REPORT.md), and [SECURITY.md](SECURITY.md). Local tests are not evidence of native Windows, antivirus clearance, live exchange correctness, or profitability. GitHub Actions results, when available, are separate evidence tied to their commit.
 
 ## License
 
-MIT. Copyright © 2026 Gateway Information Group LLC. All rights reserved.
+MIT; see [LICENSE](LICENSE). Copyright © 2026 Gateway Information Group LLC. All rights reserved.
 
-This project is independent and is not affiliated with, endorsed by, or sponsored
-by Kalshi.
+Independent project; not affiliated with, endorsed by, or sponsored by Kalshi.

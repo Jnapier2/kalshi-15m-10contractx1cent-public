@@ -1,3 +1,2 @@
-"""Offline public planning model for the exact 10×1¢ profile."""
-
-__version__ = "69.68-public.1"
+"""Kalshi 10×1¢ Public Edition; synthetic educational planning only."""
+__version__ = "69.97-public.1"
