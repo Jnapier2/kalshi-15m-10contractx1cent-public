@@ -1,4 +1,5 @@
 {
+  "build_id": "KALBUY-PUBLIC-69.99.1-EVIDENCE-REVIEW",
   "files": {
     ".gitattributes": {
       "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
@@ -13,8 +14,8 @@
       "size": 69
     },
     "CHANGELOG.md": {
-      "sha256": "582e1a56d94ccff8425ccf93742a4d9531ecb4856a5856893e9d5e9307dea3e0",
-      "size": 679
+      "sha256": "560c693bd29ef661825c9732c8d610c71a4b29f69c652e68611395d444c93e0b",
+      "size": 940
     },
     "DISCLAIMER.md": {
       "sha256": "01afeb8d52bf8945cde50143f3a5fe7df52d9dd8ae07d80e6123c15e3415a97a",
@@ -25,28 +26,28 @@
       "size": 623
     },
     "Kalshi10x1cPublic_Export.bat": {
-      "sha256": "74c26bdf721ad0235beb70300db68b74e4078fc85df185df6185da960f6b6a2d",
-      "size": 635
+      "sha256": "cfd0d228ee5e036cc883ee22d31cf7cc42db783b6cfdbe22f203952a0cbe445b",
+      "size": 633
     },
     "LICENSE": {
       "sha256": "7b2cc810096ea37951d0a6c92eb8c2921328816a3c68ea23fc84bc76f72327c0",
       "size": 1086
     },
     "PACKAGE_METADATA.json": {
-      "sha256": "d6ef62b7ad35a08221d7b6dade6c25e8a48092ed135542e3a9e78e9c26b08598",
-      "size": 1413
+      "sha256": "768d91cb25f60d5180b684e2797e1713ddc07ede621248ddb8216c6a4c4a5893",
+      "size": 2010
     },
     "PUBLIC_STERILIZATION_REPORT.md": {
-      "sha256": "2eee797087325584bd19cf65f207c600370d30f3cc0896e57f67722e311c232f",
-      "size": 1961
+      "sha256": "3dfcf4d316dc33ea48ba5fefe72e90c4208f9553fd5f41630ac578899557ca50",
+      "size": 2048
     },
     "README.md": {
-      "sha256": "4d10c8eb46b4cc375a99c25903d84c9d5ac16a8a9531d0c7e5ede62f81690c93",
-      "size": 3985
+      "sha256": "bf6bbd0c3e5b7e84c46ef4c909786b5c3e3037b7f350a0d3273cdea42e6d11d1",
+      "size": 5622
     },
     "SBOM.cdx.json": {
-      "sha256": "5c4fa924926a5f9bb3cbc81e1265f2f251033ad0c635591f8d5592ebb236d3a1",
-      "size": 345
+      "sha256": "d5b478d643245cfdcc4756280c50d40f9ad0cc25597273f0f2dcc05a429d6720",
+      "size": 2538
     },
     "SECURITY.md": {
       "sha256": "7ce019c15511e0c133fd37f803e95557c7329faf3c0002bc8f5bf49b39895b69",
@@ -61,49 +62,55 @@
       "size": 98
     },
     "VALIDATION.md": {
-      "sha256": "13a4ae0b8b4a694c5d101f68b1aacbe4a12db0aab08739cd67d97d949495961c",
-      "size": 1987
+      "sha256": "1ce921537b3e4ec5ed07704343a566eefc440c5982a8b66161be647af87b5734",
+      "size": 2384
     },
     "VERSION.txt": {
-      "sha256": "5ed6d7c648270cda8ee9e166c6a1752f549b439b9c36e14d95666774d5628605",
+      "sha256": "c24e308e57c0fd21d4ce4b46ba8f94fbe929f1dde22474653af728b3f09ae6a8",
       "size": 15
     },
     "examples/conflict_snapshot.json": {
-      "sha256": "1649711cc7104b001d6393d1220569831e02488259f5edbbf7f7f261ce0c934f",
-      "size": 742
+      "sha256": "8707184ad1ad862bdbe4b22657b39e670a70d767e3c9f4900c42aab53ef96d64",
+      "size": 738
     },
     "examples/eligible_snapshot.json": {
-      "sha256": "a9c26bb54b7dc12719a93df0d701b52cceddab65f0baa97216f6830d7cc97abc",
-      "size": 742
+      "sha256": "9beb5db69041dabb6531ba7e011292a3b3e08b072559f39766a0971bee5383db",
+      "size": 936
     },
     "examples/stale_snapshot.json": {
-      "sha256": "c36994dac7052e1c2cce03777a1cec6e8c5a24efc1317964b2a35af5464d3ea1",
-      "size": 743
+      "sha256": "07fef6477cf6ca073c246f54a06855d73c595fae43154cecd95789f575adda0e",
+      "size": 739
     },
     "kalshi_public_buy/__init__.py": {
-      "sha256": "10442f07fbead1923ae5304067e1d1e0e3230ab78c39cde25ddeb917d1524c2e",
+      "sha256": "8dd0d57d4ffef597b937b05b75c9cbdfdfebe84a692b94698b0bc8e686e8837e",
       "size": 105
     },
     "kalshi_public_buy/planner.py": {
-      "sha256": "d3b2d707fae4f1cddfdcde422db231c1ee2e2eb580356822e5c85786e523009f",
-      "size": 4121
+      "sha256": "ec0ab54b1d1044cc25a44d1ce79a28204a8902f0f838f01b526b62292cc6ce21",
+      "size": 5853
+    },
+    "public_support.py": {
+      "sha256": "4b85f609a821ca936f97a078a6a026e2d136d38dac037f1eec8dd01f6d3b78d0",
+      "size": 6378
     },
     "run_buy_planner.py": {
-      "sha256": "d9f08f6a2757cc91857e1adebc5b9b4f2731ffdd55f59fd107488e38f57084bd",
-      "size": 7831
-    },
-    "scripts/verify_release.py": {
-      "sha256": "36c436f9cc3bdbfde6164c2c83d93fba41141c8171b46822320f9a18f1cbb4c4",
-      "size": 318
+      "sha256": "32e949a3a6265c4819a6557526dc1bea498c47127d8565dc699deaf93b1ee562",
+      "size": 8074
     },
     "tests/__init__.py": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size": 0
     },
     "tests/test_public.py": {
-      "sha256": "15327ad8c9d579cecc7dfdc0e4dbe7f0978b413aac019bdaf2f33ce4710ca79f",
-      "size": 13370
+      "sha256": "77f321a2be805c1f238a26b3581c20e73808ecf58b262a2ac9779e90cb1ebfde",
+      "size": 13372
+    },
+    "tests/test_refresh.py": {
+      "sha256": "013b3afd88d9fb4e0ce70aa10e58c130b17dd0f87ee05690dfc2e443f88cae3a",
+      "size": 10782
     }
   },
-  "schema": "gateway-public-manifest-v2"
+  "package_id": "KALSHI_10X1C_PUBLIC",
+  "schema": "gateway-public-manifest-v2",
+  "version": "69.99-public.1"
 }

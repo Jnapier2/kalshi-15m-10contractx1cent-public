@@ -18,8 +18,8 @@ from kalshi_public_buy.planner import plan
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = "run_buy_planner.py"
 MODULE = "kalshi_public_buy"
-VERSION = "69.97-public.1"
-BUILD = "KALBUY-PUBLIC-69.97.1-OFFLINE-REPLACEMENT"
+VERSION = "69.99-public.1"
+BUILD = "KALBUY-PUBLIC-69.99.1-EVIDENCE-REVIEW"
 SNAPSHOT = json.loads((ROOT / "examples" / "eligible_snapshot.json").read_text())
 
 
@@ -274,7 +274,7 @@ class PackageTests(unittest.TestCase):
         self.assertIn("--export", (ROOT / "Kalshi10x1cPublic_Export.bat").read_text())
 
     def test_runtime_import_allowlist(self):
-        allowed = {"sys", "hashlib", "json", "os", "pathlib", "re", "uuid", "zipfile", MODULE}
+        allowed = {"sys", "hashlib", "json", "os", "pathlib", "re", "uuid", "runpy", "stat", MODULE}
         for path in [ROOT / ENTRY, *sorted((ROOT / MODULE).glob("*.py"))]:
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in ast.walk(tree):
@@ -295,7 +295,7 @@ class PackageTests(unittest.TestCase):
         for name in manifest["files"]:
             self.assertFalse(name.endswith((".pem", ".key", ".zip", ".log")))
             self.assertFalse(Path(name).name.startswith(".env"))
-        self.assertEqual(len(manifest["files"]) + 1, 27)
+        self.assertEqual(len(manifest["files"]) + 1, 28)
 
     def test_all_examples_valid_and_synthetic(self):
         for path in (ROOT / "examples").glob("*.json"):

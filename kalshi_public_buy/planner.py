@@ -3,7 +3,7 @@ import hashlib
 import json
 import re
 
-BUILD = "KALBUY-PUBLIC-69.97.1-OFFLINE-REPLACEMENT"
+BUILD = "KALBUY-PUBLIC-69.99.1-EVIDENCE-REVIEW"
 SCHEMA = "kalshi-public-snapshot-v2"
 TEXT_FIELDS = {"market", "round", "scope", "observed_scope", "route", "observed_route"}
 BOOL_FIELDS = {"synthetic", "market_open", "exchange_ready", "evidence_complete", "fees_complete", "prior_intent_ambiguous"}
@@ -19,9 +19,14 @@ def outcome(status, reason, **details):
 
 def plan(snapshot):
     """Fail closed; input quantities and fees are invented evidence, never live data."""
-    if not isinstance(snapshot, dict) or set(snapshot) != REQUIRED:
+    if not isinstance(snapshot, dict) or set(snapshot) not in (REQUIRED, REQUIRED | {"analysis_evidence"}):
         return outcome("INVALID", "SCHEMA_MISMATCH")
     s = snapshot
+    analysis = None
+    if "analysis_evidence" in s:
+        analysis = review_evidence(s["analysis_evidence"])
+        if analysis["status"] == "INVALID":
+            return outcome("INVALID", "INVALID_ANALYSIS_EVIDENCE")
     if s["schema"] != SCHEMA or s["synthetic"] is not True or s["side"] not in ("yes", "no"):
         return outcome("INVALID", "SYNTHETIC_INPUT_REQUIRED")
     for key in TEXT_FIELDS:
@@ -62,6 +67,8 @@ def plan(snapshot):
     identity_extra = {}
     details = {"principal_cents": 10, "modeled_entry_fee_cents": s["entry_fee_cents"],
                "required_funding_cents": required_funding, "post_only": True}
+    if analysis is not None:
+        details["analysis_review"] = analysis
     identity = {key: s[key] for key in ("market", "round", "side", "scope", "route")}
     identity.update({"action": "buy", "quantity": quantity, "price_cents": price, **identity_extra})
     intent_id = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -69,3 +76,26 @@ def plan(snapshot):
         return outcome("HOLD", "DUPLICATE_INTENT")
     return outcome("PLAN", "SYNTHETIC_PLAN_ONLY", intent_id=intent_id,
                    quantity=quantity, price_cents=price, **details)
+
+
+def review_evidence(evidence):
+    """Ordered, optional research checks; never promote a model or veto a plan."""
+    flags = {"history_complete", "lifecycle_fee_complete", "chronological_holdout_complete"}
+    numbers = {"age_seconds", "independent_response_count"}
+    if not isinstance(evidence, dict) or set(evidence) != flags | numbers:
+        return {"status": "INVALID", "reason": "SCHEMA_MISMATCH"}
+    if any(type(evidence[key]) is not bool for key in flags):
+        return {"status": "INVALID", "reason": "BOOLEAN_REQUIRED"}
+    if any(type(evidence[key]) is not int or not 0 <= evidence[key] <= 1000000 for key in numbers):
+        return {"status": "INVALID", "reason": "BOUNDED_INTEGER_REQUIRED"}
+    if evidence["independent_response_count"] < 6:
+        return {"status": "NEUTRAL", "reason": "INSUFFICIENT_INDEPENDENT_RESPONSES"}
+    if not evidence["history_complete"]:
+        return {"status": "BLOCKED", "reason": "INCOMPLETE_HISTORY"}
+    if evidence["age_seconds"] > 30:
+        return {"status": "BLOCKED", "reason": "STALE_ANALYSIS_EVIDENCE"}
+    if not evidence["lifecycle_fee_complete"]:
+        return {"status": "BLOCKED", "reason": "INCOMPLETE_LIFECYCLE_FEES"}
+    if not evidence["chronological_holdout_complete"]:
+        return {"status": "BLOCKED", "reason": "HOLDOUT_NOT_COMPLETE"}
+    return {"status": "READY_FOR_REVIEW", "reason": "NO_AUTOMATIC_PROMOTION"}

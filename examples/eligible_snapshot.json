@@ -1,5 +1,12 @@
 {
   "age_seconds": 1,
+  "analysis_evidence": {
+    "age_seconds": 1,
+    "chronological_holdout_complete": true,
+    "history_complete": true,
+    "independent_response_count": 6,
+    "lifecycle_fee_complete": true
+  },
   "balance_cents": 100,
   "best_ask_cents": 3,
   "entry_fee_cents": 1,
@@ -22,6 +29,6 @@
   "seen_intent_ids": [],
   "side": "yes",
   "status_age_seconds": 1,
-  "status_build": "KALBUY-PUBLIC-69.97.1-OFFLINE-REPLACEMENT",
+  "status_build": "KALBUY-PUBLIC-69.99.1-EVIDENCE-REVIEW",
   "synthetic": true
 }

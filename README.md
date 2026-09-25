@@ -1,47 +1,53 @@
 # Kalshi 10×1¢ Public Edition
 
-An offline educational planner demonstrating scoped funding checks, stale-data rejection, contradiction handling, and duplicate-intent prevention. It has no credentials, network access, or order authority.
+An offline educational planner demonstrating scoped funding checks, evidence-quality review, contradiction handling, and duplicate-intent prevention. It has no credentials, network access, or order authority.
 
-## Quick start
+## Try the demonstration
 
-Python 3.11 or newer; no runtime packages or account setup are required.
+Python 3.11 or newer is required. There are no third-party runtime packages, accounts, keys, installations, or network calls.
 
 ```console
 python -I -S -B run_buy_planner.py --demo
-python -I -S -B run_buy_planner.py --verify
 python -I -S -B run_buy_planner.py --menu
+python -I -S -B run_buy_planner.py --verify
 python -I -S -B run_buy_planner.py examples/conflict_snapshot.json
-python -I -S -B run_buy_planner.py --export
+python -I -S -B public_support.py --export
 python -B -m unittest discover -s tests -v
 ```
 
-On Windows, run `Kalshi10x1cPublic.bat` for the synthetic demo or pass `--menu` for grouped Start, Reports, and Setup actions. `Kalshi10x1cPublic_Export.bat` independently creates a minimal support ZIP under `outputs/support/`. Both launchers locate the project from their own directory; neither installs software or changes security settings.
+Windows: `Kalshi10x1cPublic.bat` runs the demo; add `--menu` for grouped Explore and Support actions. `Kalshi10x1cPublic_Export.bat` calls the standalone support module, not the main application. Both use their own directory rather than the caller's working directory. They never install software, elevate privileges, or change security settings.
 
-## What the planner demonstrates
+## What it demonstrates
 
-Exactly 10 whole contracts at exactly 1¢; 10¢ principal plus supplied modeled entry fees. A proposed 1¢ price must not cross the supplied best ask. Existing position or open-order exposure blocks another plan.
+The fixed public profile remains **10 whole contracts at 1¢ each**, or 10¢ principal before explicitly supplied synthetic entry fees. Checks cover scoped funding, complete and fresh evidence, price-grid support, final supplied-book crossing, existing exposure, route and scope contradictions, and duplicate intents.
 
-Each snapshot must be explicitly synthetic, use `SYNTHETIC-` identifiers, and provide complete, typed inputs. The planner checks scope and route agreement, status identity, market readiness, bounded evidence age, fee completeness, and prior-intent evidence. Unknown fields, malformed values, duplicate JSON keys, oversized inputs, and non-finite numbers are rejected without echoing their contents.
+An optional `analysis_evidence` object demonstrates ordered research checks: independent responses, complete history, evidence age, fee-complete lifecycle, and chronological holdout. Fewer than six supplied independent responses produces a neutral review. Incomplete or stale research blocks only that review, not an otherwise valid plan. `READY_FOR_REVIEW` is not statistical validation or permission to promote a model.
 
-Fees are explicit synthetic inputs used for scoped funding checks. No return, fill, or profitability claim is made.
+**Public-model distinction:** this title and teaching profile are intentionally preserved. They are not the private source's current trading-price configuration. This release demonstrates selected validation ideas from v69.99; it does not publish or claim full equivalence with its live engine, history refresh worker, learned ranking, or persistent state.
 
-Results are `PLAN`, `HOLD`, `QUARANTINE`, `INVALID`. `PLAN` is educational output only. Freshness means supplied ages are no more than 30 seconds; this offline tool cannot authenticate those ages or confirm real exchange state.
+## Inputs and results
 
-Duplicate prevention is deterministic comparison against supplied intent IDs and exposure evidence. Ambiguous prior intent requires reconciliation. It is not a durable execution ledger, a multi-process lock, or a guarantee about live orders.
+The default fixture includes the optional review object. All core quantities and ages are bounded integers; booleans must actually be booleans. Supplied market/status/fee ages above 30 seconds block planning. These are stated ages, not independently authenticated timestamps.
 
-## Public boundary
+Inputs must be explicitly synthetic and use `SYNTHETIC-` identifiers. Unknown fields, conflicting scopes, duplicate JSON keys, non-finite values, malformed numbers, oversized inputs and non-regular input files are rejected. Do not provide private account exports. Snapshot values are assertions supplied by the caller; this tool cannot establish real exchange truth.
 
-There is no transport, signing, credential loading, account access, order submission, cancellation, fund movement, or hidden live-mode option. Samples are invented. Do not use private account exports as inputs.
+Results are `PLAN`, `HOLD`, `QUARANTINE`, `INVALID`. `PLAN` is educational output without execution authority. Duplicate protection compares deterministic IDs with supplied prior IDs and exposure evidence; it is not a durable order ledger or multi-process trading guarantee.
 
-Package verification checks exact managed hashes and release identity before planner imports. Python isolated/no-site/no-bytecode flags prevent project-local import shadowing on the canonical entrypoint. Checksums detect changes against the supplied manifest; they are not a publisher signature. Only `.git/` and the non-executable `outputs/` area are excluded from the payload inventory.
+## Privacy and integrity
 
-The independent Export20 path emits four generated files without reading input snapshots, logs, source, credentials, environment variables, or account records. An integrity failure attempts one bounded local export and exits; a failed export is reported, not retried recursively.
+There is no credential loader, transport, request signer, account access, order submission, cancellation, fund movement or hidden live switch. Only reviewed public source, synthetic fixtures, tests and documentation are included; private source archives are not redistributed.
+
+The canonical entrypoint requires isolated/no-site/no-bytecode Python. It verifies exact managed payload hashes and package identity before planner imports, and checks the independent support helper against a built-in digest. Downloaded bootstrap code and the Python runtime still require a trusted source. A manifest is not a publisher signature and does not defeat an attacker replacing all code and trust records.
+
+Support exports contain **four generated safe records**, never inputs, logs, source, credentials or environment values. Files stay under `outputs/support/`. Critical integrity failures attempt an atomic capsule followed by a ZIP using already trusted support code. Unknown input or ordinary cancellation does not trigger Critical capture. `CAPSULE_ONLY`, unavailable and successful minimal capture remain distinct.
+
+Exports use a same-machine lock, 32 KiB per-file/ZIP bound, one MiB free-space minimum and a 64-attempt persistent budget. They do not prune evidence or scan user folders. A preserved stale lock or exhausted budget blocks further capture; retain the existing evidence and use a clean verified public package. Byte/operation limits are not a hard deadline against stalled OS storage. Missing Python or an untrusted bootstrap can make capture unavailable. No fallback changes protections or executes a damaged helper.
 
 ## Release and evidence
 
-Public version `69.97-public.1` is an educational reimplementation informed by source lineage `v69.97`, not a redacted live bot or a release of that private engine. The active repository tree is replaced in full while its URL, history, MIT license, public title, execution namespace, and canonical launcher are preserved.
+Version `69.99-public.1`. Existing public title, repository URL, execution namespace, canonical main/Export BAT names, MIT license and third-party notices are retained. The active tree is replaced; historical commits, branches, tags, releases and cached copies are not erased or certified.
 
-See [VALIDATION.md](VALIDATION.md), [PUBLIC_STERILIZATION_REPORT.md](PUBLIC_STERILIZATION_REPORT.md), and [SECURITY.md](SECURITY.md). Local tests are not evidence of native Windows, antivirus clearance, live exchange correctness, or profitability. GitHub Actions results, when available, are separate evidence tied to their commit.
+See [VALIDATION.md](VALIDATION.md), [PUBLIC_STERILIZATION_REPORT.md](PUBLIC_STERILIZATION_REPORT.md), [SECURITY.md](SECURITY.md), and [SBOM.cdx.json](SBOM.cdx.json). Local tests, GitHub-hosted CI, Norton status and live financial behavior are separate evidence. No profitability, antivirus clearance, or testing on the owner's computers is claimed.
 
 ## License
 
