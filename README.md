@@ -23,7 +23,7 @@ The fixed public profile remains **10 whole contracts at 1¢ each**, or 10¢ pri
 
 An optional `analysis_evidence` object demonstrates ordered research checks: independent responses, complete history, evidence age, fee-complete lifecycle, and chronological holdout. Fewer than six supplied independent responses produces a neutral review. Incomplete or stale research blocks only that review, not an otherwise valid plan. `READY_FOR_REVIEW` is not statistical validation or permission to promote a model.
 
-**Public-model distinction:** this title and teaching profile are intentionally preserved. They are not the private source's current trading-price configuration. This release demonstrates selected validation ideas from v69.99; it does not publish or claim full equivalence with its live engine, history refresh worker, learned ranking, or persistent state.
+**Public-model distinction:** this title and teaching profile are intentionally preserved. The release is an independent educational implementation using synthetic inputs. Its scope is limited to the behavior documented here.
 
 ## Inputs and results
 
